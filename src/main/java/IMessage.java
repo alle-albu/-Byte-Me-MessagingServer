@@ -1,5 +1,5 @@
 
 public interface IMessage {
-	String setupHeader();
-	String setContent();
+	void setupHeader();
+	void setContent();
 }
