@@ -24,3 +24,6 @@ Messages are not removed when read by clients, but they will be automatically de
 message header. 
 The server may be configured with a maximum time for storing messages (expiration time), that supercedes the timeout in the 
 header. Expired messaged will be automatically deleted.
+
+Link catre intrebari:
+https://docs.google.com/document/d/173JdHbIWR6dHW9FsqzMG9CwGeULHdMx2YPfOZOwipNU/edit?fbclid=IwAR0OB-FXIty4N_PcplPG7EOswa6X4dEnjUapERVIploFYU9n9KVa6PYWTqg
