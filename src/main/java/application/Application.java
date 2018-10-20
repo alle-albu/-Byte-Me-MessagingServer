@@ -1,3 +1,7 @@
+package application;
+
+import messages.IMessage;
+import server.Server;
 
 public class Application {
 
