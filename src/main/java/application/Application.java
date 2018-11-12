@@ -100,4 +100,9 @@ public class Application extends Thread{
 	public void setMessagesCapacity(int messagesCapacity) {
 		this.messagesCapacity = messagesCapacity;
 	}
+
+	public void readTopicMessages(Server server,String topic){
+		Runnable t = () -> System.out.println(server.getTopicMessagesByTopic(topic));
+		executorService.submit(t);
+	}
 }
