@@ -25,6 +25,13 @@ public class Application extends Thread{
         this.messagesQueue=new ConcurrentLinkedQueue<QueueMessage>();
     }
 
+    public Application(int id, String type,int capacity){
+        this.id=id;
+        this.type=type;
+        this.messagesQueue=new ConcurrentLinkedQueue<QueueMessage>();
+        this.messagesCapacity = capacity;
+    }
+    
 	ExecutorService executorService = Executors.newScheduledThreadPool(0);
 	ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -46,32 +53,31 @@ public class Application extends Thread{
 	}
 
 
-	public synchronized void publishQueueMsg(QueueMessage message) {
+	public synchronized void publishQueueMsg(QueueMessage message) throws InterruptedException {
 		Application recipient = message.getQueueMessageHeader().getRecipient();
 
-
-
-		Runnable t = () -> recipient.getMessagesQueue().add(message);
-
-		if (recipient.getMessagesCapacity() == 0) {
-			executorService.submit(t);
-		} else if (recipient.getMessagesQueue().size() < recipient.getMessagesCapacity()) {
-            executorService.submit(t);
-        }else {
-		    while(recipient.getMessagesQueue().size()>recipient.getMessagesCapacity()) {
-                recipient.getMessagesQueue().add(message);
-            }
-
-
-
-            /*final ScheduledFuture<?> queueHandle = scheduledExecutorService.scheduleAtFixedRate(t, 0, 1, SECONDS);
-            scheduledExecutorService.schedule(new Runnable() {
-                public void run() {
-                    if ()
-                        queueHandle.cancel(true);
-                }
-            }, 1 * 9, SECONDS);*/
-        }
+		Runnable t = () -> {
+			if (recipient.getMessagesCapacity() == 0) {
+				System.out.println("A; size " + recipient.getMessagesQueue().size());
+				recipient.getMessagesQueue().add(message);
+			} else if (recipient.getMessagesQueue().size() < recipient.getMessagesCapacity()-1) {
+				System.out.println("B; size " + recipient.getMessagesQueue().size());
+				recipient.getMessagesQueue().add(message);
+	        }else {
+	        	System.out.println("C; size " + recipient.getMessagesQueue().size());
+			    while(recipient.getMessagesQueue().size()>=recipient.getMessagesCapacity()-1) {
+			    	System.out.println("waiting...");
+			    	try {
+						executorService.awaitTermination(2, TimeUnit.SECONDS);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}	
+	            }
+			    recipient.getMessagesQueue().add(message);
+	        }
+		};
+		executorService.execute(t);
 
 	}
 
@@ -83,12 +89,12 @@ public class Application extends Thread{
 		return null;
 	}
 
-	public void readQueueMessage(){
+	public synchronized void readQueueMessage(){
 		Runnable t = () -> {
 			if(!this.messagesQueue.isEmpty()){
 				System.out.println(messagesQueue.size());
 				System.out.println(this.messagesQueue.remove().getData());
-			}};
+			} };
 		scheduledExecutorService.scheduleAtFixedRate(t,0,1, SECONDS);
 
 	}
@@ -97,9 +103,9 @@ public class Application extends Thread{
 		return messagesCapacity;
 	}
 
-	public void setMessagesCapacity(int messagesCapacity) {
-		this.messagesCapacity = messagesCapacity;
-	}
+//	public void setMessagesCapacity(int messagesCapacity) {
+//		this.messagesCapacity = messagesCapacity;
+//	}
 
 	public void readTopicMessages(Server server,String topic){
 		Runnable t = () -> System.out.println(server.getTopicMessagesByTopic(topic));
