@@ -52,11 +52,8 @@ public class Main {
         server.addTopicMessages(new TopicMessage(new TopicMessageHeader("topic",20),"mesaj3"));
         server.startTopicMessagesDeletion();
 
-        for(int i=0;i<10000000;i++) {
             application1.readTopicMessages(server,"topic");
             application2.readTopicMessages(server,"topic2");
-            Thread.sleep(1000);
-        }
         
 
     }

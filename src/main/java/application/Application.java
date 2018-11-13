@@ -109,6 +109,6 @@ public class Application extends Thread{
 
 	public void readTopicMessages(Server server,String topic){
 		Runnable t = () -> System.out.println(server.getTopicMessagesByTopic(topic));
-		executorService.submit(t);
+		scheduledExecutorService.scheduleAtFixedRate(t,0,1, SECONDS);
 	}
 }
